@@ -7,7 +7,7 @@ This assignment implements a sentiment analysis pipeline using a pre-trained BER
 ## Files
 
 - `sentiment_pipeline.py`: Python script that loads data, tokenizes it, fine-tunes BERT and performs sentiment prediction.
-- `report.pdf`: Final report pdf with explanation and list of challenges faced.
+- `Report.pdf`: Final Report pdf with explanation and list of challenges faced.
 - `README.md`: This file.
 
 ---
