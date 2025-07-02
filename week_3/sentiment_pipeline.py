@@ -15,6 +15,7 @@ def preprocess_data(dataset, tokenizer):
         return tokenizer(example["text"], truncation=True, padding='max_length', max_length=512)
     
     tokenized = dataset.map(tokenize_function, batched=True)
+    tokenized.set_format(type="torch", columns=["input_ids", "attention_mask", "label"])    
     return tokenized
 
 def compute_metrics(eval_pred):
@@ -38,7 +39,7 @@ def train_model(tokenized_datasets, tokenizer):
         num_train_epochs=2,
         weight_decay=0.01,
         logging_dir="./logs",
-        logging_steps=10,
+        logging_steps=100,
         save_total_limit=1,
     )
 
@@ -53,7 +54,7 @@ def train_model(tokenized_datasets, tokenizer):
     )
 
     trainer.train()
-    return model
+    return model, trainer
 
 def save_model(model, tokenizer, path="sentiment_model"):
     os.makedirs(path, exist_ok=True)
@@ -71,9 +72,16 @@ if __name__ == "__main__":
     dataset = load_imdb_data()
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
     tokenized_datasets = preprocess_data(dataset, tokenizer)
-    model = train_model(tokenized_datasets, tokenizer)
+    model, trainer = train_model(tokenized_datasets, tokenizer)
+    
+    results = trainer.evaluate()
+    print("\nFinal Evaluation Metrics:")
+    print(f"Accuracy: {results['eval_accuracy']:.4f}")
+    print(f"F1 Score: {results['eval_f1']:.4f}")
+
     save_model(model, tokenizer)
 
-    example = "The movie was absolutely fantastic!"
-    print("Sample input:", example)
-    print("Predicted sentiment:", predict_sentiment(example, model, tokenizer))
+    example = "The plot was weak and characters were uninteresting."
+    prediction = predict_sentiment(example, model, tokenizer)
+    print(f"\nInput: {example}")
+    print(f"Predicted sentiment: {prediction}")
