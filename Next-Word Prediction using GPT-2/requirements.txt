@@ -1,0 +1,6 @@
+transformers==4.53.1
+datasets
+evaluate
+torch
+numpy
+gradio
